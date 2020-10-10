@@ -1,0 +1,23 @@
+clear all
+File = dir('*.csv');
+length(File);
+for i = 1:length(File);
+fileID = fopen(File(i).name);
+formatSpec = '%s';
+K =85;
+Title(i,:)  = textscan(fileID,'%s',K,'Delimiter',',');
+Rawdata(i,:) = textscan(fileID,['%s',repmat('%f',[1,79]),repmat('%f',[1,180]),repmat('%f',[1,4]),repmat('%f',[1,45])],'Delimiter',{',',',{','|','}'},'TreatAsEmpty','INVALID','CollectOutput',1);
+subData(i,1) = {datetime(Rawdata{i,1})};
+subData(i,2) = {Rawdata{i,2}(:,1:8)};
+subData(i,3) = {Rawdata{i,2}(:,80:259)};
+subData(i,4) = {Rawdata{i,2}(:,264:end)};
+fclose(fileID);
+end
+
+for m=1:length(File)
+Chargestate = subData{m,2}(:,2);
+Speed =  subData{m,2}(:,4);
+FinData(m,1) ={GetCharge(Chargestate,Speed,m,subData(m,:))};
+Chargestate = [];
+Speed = [];
+end 
